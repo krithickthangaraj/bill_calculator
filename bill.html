@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill Calculator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .bill-details {
+      border-right: 2px solid #007bff; /* Blue border */
+      padding-right: 15px;
+    }
+    .bill-calculation {
+      padding-left: 15px;
+    }
+    #totalAmount {
+      background-color: #f0f0f0; /* Highlight color */
+      padding: 5px;
+    }
+    .bill-calculation {
+      border-left: 2px solid #28a745; /* Green border */
+      padding-left: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Bill Calculator</h2>
+    <div class="row">
+      <!-- Bill Details -->
+      <div class="col-md-6 bill-details">
+        <div class="form-group">
+          <label for="itemName">Item Name:</label>
+          <input type="text" class="form-control" id="itemName">
+        </div>
+        <div class="form-group">
+          <label for="price">Price Per Item:</label>
+          <input type="number" class="form-control" id="price">
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity:</label>
+          <input type="number" class="form-control" id="quantity">
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-primary btn-block" onclick="addItem()">Add Item</button>
+        </div>
+        <div class="mt-4">
+          <h4>Bill Details</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Price Per Item</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="billTableBody">
+              <!-- Bill details will be dynamically added here -->
+            </tbody>
+          </table>
+          <h4>Total Amount: <span id="totalAmount" class="font-weight-bold">0</span></h4> <!-- Added class for bold font -->
+        </div>
+      </div>
+      <!-- Bill Calculation -->
+      <div class="col-md-6 bill-calculation">
+        <div class="form-group">
+          <label for="split">Bill Split:</label>
+          <input type="number" class="form-control" id="split">
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-success btn-block" onclick="calculateTotal()">Calculate Total</button>
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-danger btn-block" onclick="reset()">Reset</button>
+        </div>
+        <div class="form-group">
+          <label for="totalSplit">Bill Split Amount:</label>
+          <input type="number" class="form-control" id="totalSplit" disabled>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    let billDetails = [];
+    
+    function addItem() {
+      const itemName = document.getElementById('itemName').value;
+      const price = parseFloat(document.getElementById('price').value);
+      const quantity = parseInt(document.getElementById('quantity').value);
+      
+      if (!itemName || isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+        alert("Please fill all fields with valid values.");
+        return;
+      }
+      
+      const total = price * quantity;
+      const itemDetails = { itemName, price, quantity, total };
+      billDetails.push(itemDetails);
+      displayBillDetails();
+      clearInputFields();
+    }
+    
+    function displayBillDetails() {
+      const billTableBody = document.getElementById('billTableBody');
+      billTableBody.innerHTML = '';
+      let totalAmount = 0;
+      
+      billDetails.forEach((item, index) => {
+        const row = `<tr>
+                      <td>${item.itemName}</td>
+                      <td>${item.price}</td>
+                      <td>${item.quantity}</td>
+                      <td>${item.total}</td>
+                      <td><button type="button" class="btn btn-danger btn-sm" onclick="removeItem(${index})">Remove</button></td>
+                    </tr>`;
+        billTableBody.innerHTML += row;
+        totalAmount += item.total;
+      });
+      
+      document.getElementById('totalAmount').innerText = totalAmount;
+    }
+    
+    function calculateTotal() {
+      let totalAmount = 0;
+      
+      billDetails.forEach(item => {
+        totalAmount += item.total;
+      });
+      
+      const split = parseInt(document.getElementById('split').value);
+      const totalSplit = totalAmount / split;
+      
+      document.getElementById('totalSplit').value = totalSplit.toFixed(2);
+    }
+    
+    function reset() {
+      billDetails = [];
+      displayBillDetails();
+      clearInputFields();
+    }
+    
+    function removeItem(index) {
+      billDetails.splice(index, 1); // Remove item at index
+      displayBillDetails();
+    }
+    
+    function clearInputFields() {
+      document.getElementById('itemName').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('quantity').value = '';
+    }
+  </script>
+</body>
+</html>
